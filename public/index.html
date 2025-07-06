@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Carpetas de Recuperación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader-white { border: 4px solid rgba(255, 255, 255, .2); border-left-color: #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .step { transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
+        .hidden-step { opacity: 0; transform: translateX(20px); position: absolute; pointer-events: none; }
+        .visible-step { opacity: 1; transform: translateX(0); position: static; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader { border: 4px solid rgba(0, 0, 0, .1); border-left-color: #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .preview-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .preview-content p { margin-bottom: 1rem; }
+        .preview-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .preview-content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .preview-content th, .preview-content td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .preview-content th { background-color: #f2f2f2; font-weight: 600; }
+        .checkbox-label { display: flex; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+        .checkbox-label:hover { background-color: #f9fafb; }
+        .checkbox-label input:checked ~ span { font-weight: 600; color: #4f46e5; }
+        .checkbox-label input:checked { border-color: #4f46e5; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div id="overlay" class="hidden fixed top-0 left-0 w-full h-full bg-black opacity-50 z-40"></div>
+<div id="floating-status" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white py-5 px-8 rounded-lg shadow-xl z-50">
+    <div class="flex items-center">
+        <div class="loader-white mr-3"></div>
+        <span id="floating-status-text">Generando...</span>
+    </div>
+</div>
+</div>
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">Generador de Carpetas de Recuperación</h1>
+            <p class="text-gray-600 mt-2">Crea documentos pedagógicos de forma rápida y asistida por IA.</p>
+        </header>
+
+        <main id="wizard-container" class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+            
+            <form id="generation-form">
+
+                <!-- PASO 1: Datos Generales (Sin cambios) -->
+                <div id="step-1" class="step visible-step">
+                    <h2 class="text-2xl font-semibold mb-2 text-indigo-600">Paso 1: Datos del Documento</h2>
+                    <p class="text-gray-500 mb-6">Completa la información básica del estudiante y el centro educativo.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="nombre-colegio" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Centro Educativo</label>
+                            <input type="text" id="nombre-colegio" value="I.E. Ángel Custodio Ramirez" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="nombre-alumno" class="block text-sm font-medium text-gray-700 mb-1">Nombres y Apellidos del Alumno(a)</label>
+                            <input type="text" id="nombre-alumno" placeholder="Ej: Ana Torres García" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="nombre-docente" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Docente</label>
+                            <input type="text" id="nombre-docente" value="Juan Manuel Caicedo Oliva" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: Selección Curricular y Tema (MODIFICADO) -->
+                <div id="step-2" class="step hidden-step">
+                    <h2 class="text-2xl font-semibold mb-2 text-indigo-600">Paso 2: Selección Curricular y Tema</h2>
+                    <p class="text-gray-500 mb-6">Elige el nivel, grado y área para cargar las competencias. Luego, define el tema principal.</p>
+                    
+                    <!-- Menús desplegables para la selección -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label for="select-nivel" class="block text-sm font-medium text-gray-700 mb-1">Nivel</label>
+                            <select id="select-nivel" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="select-grado" class="block text-sm font-medium text-gray-700 mb-1">Grado</label>
+                            <select id="select-grado" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" disabled></select>
+                        </div>
+                        <div>
+                            <label for="select-area" class="block text-sm font-medium text-gray-700 mb-1">Área Curricular</label>
+                            <select id="select-area" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" disabled></select>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor para las competencias dinámicas -->
+                    <div id="competencias-container" class="space-y-3 mb-6">
+                        <!-- Las competencias se cargarán aquí con JavaScript -->
+                    </div>
+
+                    <!-- Tema Principal -->
+                     <div>
+                        <label for="tema-principal" class="block text-sm font-medium text-gray-700 mb-1">Tema o Unidad Principal para las Actividades</label>
+                        <input type="text" id="tema-principal" value="Inecuaciones lineales y cuadráticas" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ej: Ecuaciones de primer grado, La célula, etc.">
+                    </div>
+                </div>
+
+            </form>
+
+            <div id="wizard-navigation" class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors invisible">Anterior</button>
+                <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Siguiente</button>
+                <button id="generate-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors hidden">Generar Vista Previa</button>
+            </div>
+        </main>
+
+        <section id="resultado-container" class="hidden mt-8 bg-white p-6 md:p-8 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold mb-6 text-center text-indigo-600">Vista Previa del Documento</h2>
+            <div id="preview-content" class="preview-content prose max-w-none prose-indigo"></div>
+            <div id="loading-indicator" class="hidden flex items-center justify-center my-6">
+                <div class="loader"></div>
+                <p class="ml-4 text-gray-600 font-semibold">Generando con Gemini, por favor espera...</p>
+            </div>
+            <div id="download-section" class="text-center mt-8 hidden">
+                 <p class="text-sm text-gray-500 mb-4">La vista previa ha finalizado. Si todo es correcto, puedes descargar el documento final.</p>
+                <button id="download-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-md">Descargar Archivo .docx</button>
+            </div>
+        </section>
+
+        <footer class="text-center mt-12 text-sm text-gray-500">
+            <p>Una herramienta creada por <a href="#" class="text-indigo-600 hover:underline">Juan Manuel Caicedo Oliva</a> con el poder de la IA de Gemini.</p>
+            <p>&copy; 2025. Todos los derechos reservados.</p>
+        </footer>
+
+    </div>
+
+    <!-- **IMPORTANTE:** Cargar los scripts en el orden correcto -->
+    <script src="data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

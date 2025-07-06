@@ -1,0 +1,18 @@
+# --- Configuración para Netlify ---
+# Este archivo le indica a Netlify cómo construir y desplegar el sitio.
+# También es utilizado por el comando `netlify dev` para el entorno local.
+
+[build]
+  # Directorio que contiene los archivos estáticos del frontend (HTML, JS, CSS).
+  publish = "public/"
+  
+  # Directorio donde se encuentran las funciones serverless.
+  functions = "netlify/functions/"
+
+# --- Configuración para el entorno de desarrollo local (`netlify dev`) ---
+[dev]
+  # Puerto para el servidor local. Puedes cambiarlo si es necesario.
+  port = 8888
+  
+  # Directorio a servir. Coincide con el `publish` de arriba.
+  publish = "public"

@@ -1,0 +1,22 @@
+{
+  "name": "generador-carpetas-recuperacion",
+  "version": "1.0.0",
+  "description": "Generador de Carpetas de Recuperación con frontend SPA y backend serverless en Netlify.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "keywords": [
+    "netlify",
+    "serverless",
+    "docx",
+    "gemini-api"
+  ],
+  "author": "Desarrollado con Gemini",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.11.3",
+    "docx": "^8.5.0",
+    "dotenv": "^16.4.5"
+  }
+}
