@@ -59,21 +59,6 @@ function parseMarkdown(markdown) {
 }
 
 exports.handler = async (event) => {
-  // --- CÓDIGO DE DEPURACIÓN PARA VER LAS RUTAS EN NETLIFY ---
-  console.log("--- INICIANDO DEPURACIÓN DE RUTA ---");
-  console.log("Directorio de trabajo (process.cwd()):", process.cwd());
-  console.log("Archivos en process.cwd():", fs.readdirSync(process.cwd()));
-  
-  const publicPath = path.join(process.cwd(), 'public');
-  console.log("Ruta a public calculada:", publicPath);
-  try {
-      console.log("Archivos en la carpeta public:", fs.readdirSync(publicPath));
-  } catch (e) {
-      console.log("Error al leer la carpeta public:", e.message);
-  }
-  console.log("--- FIN DE DEPURACIÓN ---");
-  // --- FIN DEL CÓDIGO DE DEPURACIÓN ---
-
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -102,7 +87,8 @@ exports.handler = async (event) => {
         return elements;
     };
     
-    const imagePath = path.join(process.cwd(), 'public', 'portada_unificada.png');
+    // La ruta correcta: busca el archivo en la misma carpeta que este script
+    const imagePath = path.join(__dirname, 'portada_unificada.png');
 
     const doc = new Document({
       creator: `Generador de Carpetas - ${formData.nombreDocente}`,
