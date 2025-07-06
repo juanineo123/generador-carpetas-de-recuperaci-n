@@ -14,7 +14,6 @@ const {
 const fs = require("fs");
 const path = require("path");
 
-// --- LAS FUNCIONES parseMarkdown Y parseInlineFormatting NO CAMBIAN ---
 function parseInlineFormatting(text) {
     const runs = [];
     const regex = /(\*\*.*?\*\*)|(\*.*?\*)/g;
@@ -59,9 +58,22 @@ function parseMarkdown(markdown) {
   return elements;
 }
 
-
-// --- FUNCIÓN HANDLER DE NETLIFY ---
 exports.handler = async (event) => {
+  // --- CÓDIGO DE DEPURACIÓN PARA VER LAS RUTAS EN NETLIFY ---
+  console.log("--- INICIANDO DEPURACIÓN DE RUTA ---");
+  console.log("Directorio de trabajo (process.cwd()):", process.cwd());
+  console.log("Archivos en process.cwd():", fs.readdirSync(process.cwd()));
+  
+  const publicPath = path.join(process.cwd(), 'public');
+  console.log("Ruta a public calculada:", publicPath);
+  try {
+      console.log("Archivos en la carpeta public:", fs.readdirSync(publicPath));
+  } catch (e) {
+      console.log("Error al leer la carpeta public:", e.message);
+  }
+  console.log("--- FIN DE DEPURACIÓN ---");
+  // --- FIN DEL CÓDIGO DE DEPURACIÓN ---
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -89,56 +101,38 @@ exports.handler = async (event) => {
         });
         return elements;
     };
+    
+    const imagePath = path.join(process.cwd(), 'public', 'portada_unificada.png');
 
     const doc = new Document({
       creator: `Generador de Carpetas - ${formData.nombreDocente}`,
       title: `Carpeta de Recuperación - ${formData.nombreAlumno}`,
       styles: {
-        default: {
-            document: { run: { size: 22, font: "Calibri" } },
-            heading1: { run: { size: 32, bold: true, color: "2E74B5" } },
-            heading2: { run: { size: 24, bold: true } },
-            heading3: { run: { size: 22, bold: true } },
-        },
+        default: { document: { run: { size: 22, font: "Calibri" } } },
         paragraphStyles: [{ id: "ListParagraph", name: "List Paragraph", basedOn: "Normal", next: "Normal", run: { size: 22, font: "Calibri" } }],
       },
       sections: [{
         properties: {},
         children: [
-          // Párrafo para la imagen con posicionamiento y tamaño forzado
           new Paragraph({
             children: [
                 new ImageRun({
-                    data: fs.readFileSync(path.join(process.cwd(), 'public', 'portada_unificada.png')),
-                    transformation: {
-                        width: 450,  // Equivalente a 15.88 cm
-                        height: 525, // Equivalente a 18.52 cm
-                    },
-                    // Con esta propiedad "floating", forzamos la posición y tamaño
+                    data: fs.readFileSync(imagePath),
+                    transformation: { width: 450, height: 525 },
                     floating: {
-                        horizontalPosition: {
-                            relative: HorizontalPositionRelativeFrom.PAGE,
-                            align: HorizontalPositionAlign.CENTER,
-                        },
-                        verticalPosition: {
-        relative: VerticalPositionRelativeFrom.PAGE,
-        offset: 914400, // Equivale a 1 pulgada (2.54 cm) de margen superior
-                        },
+                        horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, align: HorizontalPositionAlign.CENTER },
+                        verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: 914400 },
                     },
                 }),
             ],
           }),
-
-          // El resto del texto de la carátula
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 7000 }, children: [ new TextRun({ text: "" }) ] }), // Espaciador invisible para empujar el texto hacia abajo
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 7000 }, children: [ new TextRun({ text: "" }) ] }),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [ new TextRun({ text: formData.nombreColegio, bold: true, color: "2E74B5", size: 32 }) ] }),
           new Paragraph({ spacing: { after: 150 }, children: [ new TextRun({ text: "ÁREA CURRICULAR:", bold: true, size: 22 }), new TextRun({ text: `   ${formData.area}`, size: 22 }) ] }),
           new Paragraph({ spacing: { after: 150 }, children: [ new TextRun({ text: "ESTUDIANTE:", bold: true, size: 22 }), new TextRun({ text: `   ${formData.nombreAlumno}`, size: 22 }) ] }),
           new Paragraph({ spacing: { after: 150 }, children: [ new TextRun({ text: "GRADO Y SECCIÓN:", bold: true, size: 22 }), new TextRun({ text: `   ${formData.grado}`, size: 22 }) ] }),
           new Paragraph({ spacing: { after: 150 }, children: [ new TextRun({ text: "DOCENTE:", bold: true, size: 22 }), new TextRun({ text: `   ${formData.nombreDocente}`, size: 22 }) ] }),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400 }, children: [new TextRun({ text: "2025", size: 22 })], pageBreakBefore: true }),
-          
-          // --- CONTENIDO DEL DOCUMENTO ---
           createSectionTitle("Presentación"),
           ...parseMarkdown(aiContent['Presentación']),
           ...createCompetenciasSection(formData.competencias),
@@ -153,10 +147,7 @@ exports.handler = async (event) => {
     const buffer = await Packer.toBuffer(doc);
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="Carpeta_Recuperacion_${formData.nombreAlumno.replace(/ /g, '_')}.docx"`,
-      },
+      headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Content-Disposition': `attachment; filename="Carpeta_Recuperacion_${formData.nombreAlumno.replace(/ /g, '_')}.docx"`, },
       body: buffer.toString('base64'),
       isBase64Encoded: true,
     };
