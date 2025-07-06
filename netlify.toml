@@ -16,3 +16,5 @@
   
   # Directorio a servir. Coincide con el `publish` de arriba.
   publish = "public"
+[functions]
+  included_files = ["netlify/functions/portada_unificada.png"]
