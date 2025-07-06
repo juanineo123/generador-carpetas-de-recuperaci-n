@@ -109,7 +109,7 @@ exports.handler = async (event) => {
           new Paragraph({
             children: [
                 new ImageRun({
-                    data: fs.readFileSync(path.join(__dirname, 'portada_unificada.png')),
+                    data: fs.readFileSync(path.join(process.cwd(), 'public', 'portada_unificada.png')),
                     transformation: {
                         width: 450,  // Equivalente a 15.88 cm
                         height: 525, // Equivalente a 18.52 cm
