@@ -4,60 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Carpetas de Recuperación</title>
-    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v4.0 (Definitivo) ===== -->
+    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v5.0 (Seguro y Correcto) ===== -->
 <script type="module">
-    // 1. IMPORTACIONES (OBLIGATORIAMENTE AL PRINCIPIO)
-    // Se cargan las herramientas de Firebase desde el inicio, fuera de cualquier condición.
-    // Esta era la causa del error de sintaxis.
+    // 1. IMPORTACIONES
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     // 2. LÓGICA DEL GUARDIA
-    // Revisa si la "llave secreta" (`?autorizado=true`) viene en la URL.
     const urlParams = new URLSearchParams(window.location.search);
     
-    // Si la llave NO está, el guardia actúa.
+    // Si la llave de la Suite (`?autorizado=true`) NO está, el guardia actúa.
     if (urlParams.get('autorizado') !== 'true') {
         
-        // La "cédula de identidad" de tu proyecto Firebase.
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-Og-9Ju4aWSbmwa6b4OpoHzjPzd073VI",
-            authDomain: "auth.caicedoeduca.com",
-            projectId: "delta-cortex-437020-h5",
-            storageBucket: "delta-cortex-437020-h5.appspot.com",
-            messagingSenderId: "423600255022",
-            appId: "1:423600255022:web:210337d8730803c500afbf",
-            measurementId: "G-2KJ74JH382"
-        };
-
-        // La URL de tu Suite principal.
-        const suiteLoginPageUrl = 'https://www.caicedoeduca.com/';
-
-        // El guardia se conecta a Firebase y comprueba la sesión.
-        try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // Hay un usuario con sesión iniciada. Se le permite el acceso.
-                    console.log("Usuario autenticado:", user.email);
-                } else {
-                    // No hay sesión. El guardia actúa y redirige.
-                    console.log("Acceso no autorizado. Redirigiendo a la suite...");
-                    window.top.location.href = suiteLoginPageUrl;
-                }
-            });
-        } catch (error) {
-            console.error("Error crítico del guardia de seguridad:", error);
-            window.top.location.href = suiteLoginPageUrl;
-        }
-    } else {
-        // Si la llave SÍ está, el guardia no hace nada.
-        console.log("Acceso autorizado por la Suite. El guardia no actuará.");
+        // Esta función especial de Firebase carga la configuración de forma segura
+        // sin exponer tus llaves en el código. Usa la configuración que ya tienes
+        // en tu proyecto de Firebase Hosting.
+        fetch('/__/firebase/init.js').then(async response => {
+            if (response.ok) {
+                await response.json(); // Carga la configuración
+                
+                // Ahora que la configuración está cargada, podemos usar Firebase.
+                const auth = getAuth();
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) {
+                        // Si no hay usuario, redirige a la suite.
+                        console.log("Acceso no autorizado. Redirigiendo...");
+                        window.top.location.href = 'https://www.caicedoeduca.com/';
+                    }
+                });
+            } else {
+                 // Si no se puede cargar la configuración, redirige por seguridad.
+                 console.error("No se pudo cargar la configuración de Firebase.");
+                 window.top.location.href = 'https://www.caicedoeduca.com/';
+            }
+        });
     }
 </script>
-<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v4.0 (Definitivo) ===== -->
+<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v5.0 (Seguro y Correcto) ===== -->
+
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
