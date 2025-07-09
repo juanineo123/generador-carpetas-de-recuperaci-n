@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Carpetas de Recuperación</title>
-    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v3.2 (Sintaxis Corregida) ===== -->
+    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v4.0 (Definitivo) ===== -->
 <script type="module">
-    // 1. Revisa si la "llave secreta" (`?autorizado=true`) viene en la URL.
-    // Si la Suite nos da permiso, el guardia no hace nada y permite el acceso.
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('autorizado') === 'true') {
-        console.log("Acceso autorizado por la Suite. El guardia no actuará.");
-    } else {
-        // Si no hay llave, es un acceso directo. El guardia se pone a trabajar.
-        // Carga las herramientas de Firebase que necesita.
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    // 1. IMPORTACIONES (OBLIGATORIAMENTE AL PRINCIPIO)
+    // Se cargan las herramientas de Firebase desde el inicio, fuera de cualquier condición.
+    // Esta era la causa del error de sintaxis.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-        // 2. La "cédula de identidad" de tu proyecto Firebase.
-        // ¡ESTA ES LA CONFIGURACIÓN CORRECTA, LA MISMA QUE USA TU SUITE!
+    // 2. LÓGICA DEL GUARDIA
+    // Revisa si la "llave secreta" (`?autorizado=true`) viene en la URL.
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Si la llave NO está, el guardia actúa.
+    if (urlParams.get('autorizado') !== 'true') {
+        
+        // La "cédula de identidad" de tu proyecto Firebase.
         const firebaseConfig = {
             apiKey: "AIzaSyC-Og-9Ju4aWSbmwa6b4OpoHzjPzd073VI",
             authDomain: "auth.caicedoeduca.com",
@@ -29,36 +30,34 @@
             measurementId: "G-2KJ74JH382"
         };
 
-        // 3. La URL de tu Suite principal.
+        // La URL de tu Suite principal.
         const suiteLoginPageUrl = 'https://www.caicedoeduca.com/';
 
-        // 4. El guardia se conecta a Firebase y comprueba la sesión.
+        // El guardia se conecta a Firebase y comprueba la sesión.
         try {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
 
-            // Este listener se activa en cuanto se sabe el estado del usuario.
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // Hay un usuario con sesión iniciada. ¡Lo dejamos pasar!
+                    // Hay un usuario con sesión iniciada. Se le permite el acceso.
                     console.log("Usuario autenticado:", user.email);
                 } else {
-                    // No hay sesión. El guardia actúa y redirige a la página principal.
+                    // No hay sesión. El guardia actúa y redirige.
                     console.log("Acceso no autorizado. Redirigiendo a la suite...");
                     window.top.location.href = suiteLoginPageUrl;
                 }
             });
         } catch (error) {
             console.error("Error crítico del guardia de seguridad:", error);
-            // En caso de un error grave, por seguridad, redirigimos.
             window.top.location.href = suiteLoginPageUrl;
         }
+    } else {
+        // Si la llave SÍ está, el guardia no hace nada.
+        console.log("Acceso autorizado por la Suite. El guardia no actuará.");
     }
 </script>
-<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v3.2 (Firebase) ===== -->
-
-
-
+<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v4.0 (Definitivo) ===== -->
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
