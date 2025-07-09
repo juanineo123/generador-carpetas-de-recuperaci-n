@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Carpetas de Recuperación</title>
-    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v3.1 (Firebase) ===== -->
+    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v3.2 (Sintaxis Corregida) ===== -->
 <script type="module">
     // 1. Revisa si la "llave secreta" (`?autorizado=true`) viene en la URL.
     // Si la Suite nos da permiso, el guardia no hace nada y permite el acceso.
@@ -41,7 +41,6 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     // Hay un usuario con sesión iniciada. ¡Lo dejamos pasar!
-                    // Esto no debería ocurrir en un acceso directo, pero es una salvaguarda.
                     console.log("Usuario autenticado:", user.email);
                 } else {
                     // No hay sesión. El guardia actúa y redirige a la página principal.
@@ -56,7 +55,8 @@
         }
     }
 </script>
-<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v3.1 (Firebase) ===== -->
+<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v3.2 (Firebase) ===== -->
+
 
 
 
