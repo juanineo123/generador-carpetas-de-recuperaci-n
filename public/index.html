@@ -4,34 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Carpetas de Recuperación</title>
-    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v3.0 (Firebase) ===== -->
+    <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD v3.1 (Firebase) ===== -->
 <script type="module">
-    // 1. Revisa si la "llave secreta" viene en la URL.
-    // Si la Suite nos da permiso, el guardia no hace nada y se va a descansar.
+    // 1. Revisa si la "llave secreta" (`?autorizado=true`) viene en la URL.
+    // Si la Suite nos da permiso, el guardia no hace nada y permite el acceso.
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('autorizado') === 'true') {
-        // No hagas nada. Permite que el generador se cargue.
         console.log("Acceso autorizado por la Suite. El guardia no actuará.");
     } else {
-        // Si no hay llave, el guardia se pone a trabajar.
+        // Si no hay llave, es un acceso directo. El guardia se pone a trabajar.
         // Carga las herramientas de Firebase que necesita.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         // 2. La "cédula de identidad" de tu proyecto Firebase.
-        // Esta es la configuración que me pasaste.
+        // ¡ESTA ES LA CONFIGURACIÓN CORRECTA, LA MISMA QUE USA TU SUITE!
         const firebaseConfig = {
-            apiKey: "AIzaSyDM6lxqNQk_EkDux4rtXgE6UhG1AaQL5ss",
-            authDomain: "delta-cortex-437020-h5.firebaseapp.com",
+            apiKey: "AIzaSyC-Og-9Ju4aWSbmwa6b4OpoHzjPzd073VI",
+            authDomain: "auth.caicedoeduca.com",
             projectId: "delta-cortex-437020-h5",
-            storageBucket: "delta-cortex-437020-h5.firebasestorage.app",
+            storageBucket: "delta-cortex-437020-h5.appspot.com",
             messagingSenderId: "423600255022",
             appId: "1:423600255022:web:210337d8730803c500afbf",
-            measurementId: "G-2KJ74JH302"
+            measurementId: "G-2KJ74JH382"
         };
 
         // 3. La URL de tu Suite principal.
-        // ¡IMPORTANTE! Asegúrate de que esta es la dirección correcta de tu página de login.
         const suiteLoginPageUrl = 'https://www.caicedoeduca.com/';
 
         // 4. El guardia se conecta a Firebase y comprueba la sesión.
@@ -39,14 +37,15 @@
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
 
+            // Este listener se activa en cuanto se sabe el estado del usuario.
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     // Hay un usuario con sesión iniciada. ¡Lo dejamos pasar!
+                    // Esto no debería ocurrir en un acceso directo, pero es una salvaguarda.
                     console.log("Usuario autenticado:", user.email);
                 } else {
-                    // No hay sesión. El guardia actúa y redirige.
+                    // No hay sesión. El guardia actúa y redirige a la página principal.
                     console.log("Acceso no autorizado. Redirigiendo a la suite...");
-                    // Usamos top.location para asegurar que se redirija la página principal.
                     window.top.location.href = suiteLoginPageUrl;
                 }
             });
@@ -57,7 +56,8 @@
         }
     }
 </script>
-<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v3.0 (Firebase) ===== -->
+<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD v3.1 (Firebase) ===== -->
+
 
 
     <script src="https://cdn.tailwindcss.com"></script>
