@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const MAXIMOS_INTENTOS = 3;
+    const ESPERA_ENTRE_INTENTOS_MS = 2000;
     // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
     const wizardContainer = document.getElementById('wizard-container');
     const resultadoContainer = document.getElementById('resultado-container');
@@ -147,14 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         previewContent.insertAdjacentHTML('beforeend', sectionHtml);
     };
-    
+
     const startGenerationProcess = async () => {
         previewContent.innerHTML = '';
         generatedAIContent = {};
         downloadSection.classList.add('hidden');
 
         const formData = getFormData();
-        
+
         try {
             showStatus('Generando Presentación...');
             const presentacionPrompt = `Actúa como un docente experto de ${formData.area}. Redacta una presentación cálida y motivadora para una carpeta de recuperación. Explica brevemente que esta carpeta es una oportunidad para reforzar competencias clave para su éxito académico. Dirígete al alumno directamente.`;
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const criteriosPrompt = `Redacta los criterios de evaluación para la carpeta de recuperación. Menciona puntualidad en la entrega, claridad en el desarrollo, orden y limpieza. Formatea la respuesta como una lista de viñetas.`;
             generatedAIContent['Criterios de Evaluación'] = await callGenerateContentAPI(criteriosPrompt);
             appendContentToPreview('Criterios de Evaluación', generatedAIContent['Criterios de Evaluación']);
-            
+
             hideStatus();
             downloadSection.classList.remove('hidden');
             downloadSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -191,22 +193,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // REEMPLAZA TU FUNCIÓN ANTIGUA CON ESTA VERSIÓN ROBUSTA
     const callGenerateContentAPI = async (prompt) => {
-        try {
-            const response = await fetch('/.netlify/functions/generate-contenido', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
-            });
-            if (!response.ok) {
-                throw new Error(`La API de Gemini respondió con un error: ${response.status}`);
+        let ultimoError = null; // Guardaremos el último error por si todos los intentos fallan
+
+        for (let intento = 1; intento <= MAXIMOS_INTENTOS; intento++) {
+            try {
+                console.log(`Iniciando llamada a la API, intento #${intento}...`);
+
+                const response = await fetch('/.netlify/functions/generate-contenido', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                // Si la respuesta es exitosa (ej: 200 OK), procesamos y devolvemos el resultado.
+                if (response.ok) {
+                    console.log(`¡Éxito en el intento #${intento}!`);
+                    const data = await response.json();
+                    return data.text; // Salimos de la función con el texto. ¡Misión cumplida!
+                }
+
+                // Si la respuesta es un error de servidor (503, 502, 504), es un error temporal.
+                if (response.status === 503 || response.status === 502 || response.status === 504) {
+                    // Creamos un error específico para que el 'catch' lo gestione y provoque un reintento.
+                    throw new Error(`Error de servidor temporal: ${response.status}`);
+                }
+
+                // Si es cualquier otro error (400, 401, etc.), es un error permanente. No reintentamos.
+                const errorData = await response.text();
+                throw new Error(`Error de API no recuperable: ${response.status} - ${errorData}`);
+
+            } catch (error) {
+                console.error(`Falló el intento #${intento}:`, error.message);
+                ultimoError = error; // Guardamos el error
+
+                // Si ya no quedan más intentos, salimos del bucle para no esperar inútilmente.
+                if (intento === MAXIMOS_INTENTOS) {
+                    break;
+                }
+
+                // Antes del siguiente intento, actualizamos la interfaz y esperamos.
+                showStatus(`Servidores ocupados. Reintentando en ${ESPERA_ENTRE_INTENTOS_MS / 1000}s...`);
+                await new Promise(resolve => setTimeout(resolve, ESPERA_ENTRE_INTENTOS_MS));
             }
-            const data = await response.json();
-            return data.text;
-        } catch (error) {
-            console.error("Error en callGenerateContentAPI:", error);
-            throw error;
         }
+
+        // Si el bucle termina y nunca hubo un 'return' exitoso, lanzamos el último error capturado.
+        console.error("Todos los reintentos fallaron.");
+        throw ultimoError;
     };
 
     // --- LÓGICA DE DATOS Y DESCARGA ---
@@ -218,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const allCompetencias = curriculumData[nivel][grado][area].competencias;
         const selectedIds = Array.from(competenciasContainer.querySelectorAll('input:checked')).map(cb => cb.value);
-        
+
         return allCompetencias.filter(comp => selectedIds.includes(comp.id));
     };
 
@@ -243,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData: getFormData(),
             aiContent: generatedAIContent
         };
-        
+
         try {
             const response = await fetch('/.netlify/functions/generate-word', {
                 method: 'POST',
@@ -252,10 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) throw new Error(`Error en el servidor al crear el DOCX: ${response.statusText}`);
-            
+
             const blob = await response.blob();
             const filename = `Carpeta_Recuperacion_${getFormData().nombreAlumno.replace(/ /g, '_')}.docx`;
-            
+
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';

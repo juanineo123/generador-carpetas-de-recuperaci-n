@@ -1,117 +1,211 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Carpetas de Recuperación</title>
     <!-- ===== INICIO DEL CÓDIGO GUARDIA DE SEGURIDAD FINAL (Compatible con Netlify) ===== -->
-<script type="module">
-    // 1. IMPORTACIONES (Siempre al principio)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    <script type="module">
+        // 1. IMPORTACIONES (Siempre al principio)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    // 2. LÓGICA DEL GUARDIA
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Si la "llave" de la Suite (`?autorizado=true`) NO está, el guardia actúa.
-    if (urlParams.get('autorizado') !== 'true') {
-        
-        // La configuración de Firebase. Es necesaria para que funcione en Netlify.
-        // La seguridad real está en los "Dominios Autorizados" de la consola de Firebase.
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-Og-9Ju4aWSbmwa6b4OpoHzjPzd073VI",
-            authDomain: "auth.caicedoeduca.com",
-            projectId: "delta-cortex-437020-h5",
-            storageBucket: "delta-cortex-437020-h5.appspot.com",
-            messagingSenderId: "423600255022",
-            appId: "1:423600255022:web:210337d8730803c500afbf",
-            measurementId: "G-2KJ74JH382"
-        };
+        // 2. LÓGICA DEL GUARDIA
+        const urlParams = new URLSearchParams(window.location.search);
 
-        const suiteLoginPageUrl = 'https://www.caicedoeduca.com/';
+        // Si la "llave" de la Suite (`?autorizado=true`) NO está, el guardia actúa.
+        if (urlParams.get('autorizado') !== 'true') {
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
+            // La configuración de Firebase. Es necesaria para que funcione en Netlify.
+            // La seguridad real está en los "Dominios Autorizados" de la consola de Firebase.
+            const firebaseConfig = {
+                apiKey: "AIzaSyC-Og-9Ju4aWSbmwa6b4OpoHzjPzd073VI",
+                authDomain: "auth.caicedoeduca.com",
+                projectId: "delta-cortex-437020-h5",
+                storageBucket: "delta-cortex-437020-h5.appspot.com",
+                messagingSenderId: "423600255022",
+                appId: "1:423600255022:web:210337d8730803c500afbf",
+                measurementId: "G-2KJ74JH382"
+            };
 
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    // Si no hay sesión de usuario, redirige a la suite.
-                    console.log("GUARDIA: Acceso no autorizado. Redirigiendo a la suite...");
-                    window.top.location.href = suiteLoginPageUrl;
-                } else {
-                    console.log("GUARDIA: Usuario autenticado. Acceso permitido.");
-                }
-            });
-        } catch (error) {
-            console.error("GUARDIA: Error crítico.", error);
-            window.top.location.href = suiteLoginPageUrl;
+            const suiteLoginPageUrl = 'https://www.caicedoeduca.com/';
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) {
+                        // Si no hay sesión de usuario, redirige a la suite.
+                        console.log("GUARDIA: Acceso no autorizado. Redirigiendo a la suite...");
+                        window.top.location.href = suiteLoginPageUrl;
+                    } else {
+                        console.log("GUARDIA: Usuario autenticado. Acceso permitido.");
+                    }
+                });
+            } catch (error) {
+                console.error("GUARDIA: Error crítico.", error);
+                window.top.location.href = suiteLoginPageUrl;
+            }
+        } else {
+            // Si la llave de la Suite está presente, el guardia no hace nada.
+            console.log("GUARDIA: Acceso autorizado por la Suite. El guardia no actuará.");
         }
-    } else {
-        // Si la llave de la Suite está presente, el guardia no hace nada.
-        console.log("GUARDIA: Acceso autorizado por la Suite. El guardia no actuará.");
-    }
-</script>
-<!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD FINAL (Compatible con Netlify) ===== -->
+    </script>
+    <!-- ===== FIN DEL CÓDIGO GUARDIA DE SEGURIDAD FINAL (Compatible con Netlify) ===== -->
 
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .loader-white { border: 4px solid rgba(255, 255, 255, .2); border-left-color: #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-        .step { transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
-        .hidden-step { opacity: 0; transform: translateX(20px); position: absolute; pointer-events: none; }
-        .visible-step { opacity: 1; transform: translateX(0); position: static; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader { border: 4px solid rgba(0, 0, 0, .1); border-left-color: #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-        .preview-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .preview-content p { margin-bottom: 1rem; }
-        .preview-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
-        .preview-content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-        .preview-content th, .preview-content td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .preview-content th { background-color: #f2f2f2; font-weight: 600; }
-        .checkbox-label { display: flex; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
-        .checkbox-label:hover { background-color: #f9fafb; }
-        .checkbox-label input:checked ~ span { font-weight: 600; color: #4f46e5; }
-        .checkbox-label input:checked { border-color: #4f46e5; }
+        .loader-white {
+            border: 4px solid rgba(255, 255, 255, .2);
+            border-left-color: #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        .step {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .hidden-step {
+            opacity: 0;
+            transform: translateX(20px);
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .visible-step {
+            opacity: 1;
+            transform: translateX(0);
+            position: static;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader {
+            border: 4px solid rgba(0, 0, 0, .1);
+            border-left-color: #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        .preview-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-content p {
+            margin-bottom: 1rem;
+        }
+
+        .preview-content ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .preview-content th,
+        .preview-content td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .preview-content th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background-color: #f9fafb;
+        }
+
+        .checkbox-label input:checked~span {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .checkbox-label input:checked {
+            border-color: #4f46e5;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 font-sans text-gray-800">
 
     <div id="overlay" class="hidden fixed top-0 left-0 w-full h-full bg-black opacity-50 z-40"></div>
-<div id="floating-status" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white py-5 px-8 rounded-lg shadow-xl z-50">
-    <div class="flex items-center">
-        <div class="loader-white mr-3"></div>
-        <span id="floating-status-text">Generando...</span>
+    <div id="floating-status"
+        class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white py-5 px-8 rounded-lg shadow-xl z-50">
+        <div class="flex items-center">
+            <div class="loader-white mr-3"></div>
+            <span id="floating-status-text">Generando...</span>
+        </div>
     </div>
-</div>
-</div>
+    </div>
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        
+
         <header class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">Generador de Carpetas de Recuperación</h1>
             <p class="text-gray-600 mt-2">Crea documentos pedagógicos de forma rápida y asistida por IA.</p>
         </header>
 
         <main id="wizard-container" class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
-            
+
             <form id="generation-form">
 
                 <!-- PASO 1: Datos Generales (Sin cambios) -->
                 <div id="step-1" class="step visible-step">
                     <h2 class="text-2xl font-semibold mb-2 text-indigo-600">Paso 1: Datos del Documento</h2>
-                    <p class="text-gray-500 mb-6">Completa la información básica del estudiante y el centro educativo.</p>
+                    <p class="text-gray-500 mb-6">Completa la información básica del estudiante y el centro educativo.
+                    </p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label for="nombre-colegio" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Centro Educativo</label>
-                            <input type="text" id="nombre-colegio" value="I.E. Ángel Custodio Ramirez" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <label for="nombre-colegio" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
+                                Centro Educativo</label>
+                            <input type="text" id="nombre-colegio" value="I.E. Ángel Custodio Ramirez"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                required>
                         </div>
                         <div>
-                            <label for="nombre-alumno" class="block text-sm font-medium text-gray-700 mb-1">Nombres y Apellidos del Alumno(a)</label>
-                            <input type="text" id="nombre-alumno" placeholder="Ej: Ana Torres García" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <label for="nombre-alumno" class="block text-sm font-medium text-gray-700 mb-1">Nombres y
+                                Apellidos del Alumno(a)</label>
+                            <input type="text" id="nombre-alumno" placeholder="Ej: Ana Torres García"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                required>
                         </div>
                         <div>
-                            <label for="nombre-docente" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Docente</label>
-                            <input type="text" id="nombre-docente" value="Juan Manuel Caicedo Oliva" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <label for="nombre-docente" class="block text-sm font-medium text-gray-700 mb-1">Nombre del
+                                Docente</label>
+                            <input type="text" id="nombre-docente" value="Juan Manuel Caicedo Oliva"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                required>
                         </div>
                     </div>
                 </div>
@@ -119,21 +213,28 @@
                 <!-- PASO 2: Selección Curricular y Tema (MODIFICADO) -->
                 <div id="step-2" class="step hidden-step">
                     <h2 class="text-2xl font-semibold mb-2 text-indigo-600">Paso 2: Selección Curricular y Tema</h2>
-                    <p class="text-gray-500 mb-6">Elige el nivel, grado y área para cargar las competencias. Luego, define el tema principal.</p>
-                    
+                    <p class="text-gray-500 mb-6">Elige el nivel, grado y área para cargar las competencias. Luego,
+                        define el tema principal.</p>
+
                     <!-- Menús desplegables para la selección -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
                             <label for="select-nivel" class="block text-sm font-medium text-gray-700 mb-1">Nivel</label>
-                            <select id="select-nivel" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
+                            <select id="select-nivel"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
                         </div>
                         <div>
                             <label for="select-grado" class="block text-sm font-medium text-gray-700 mb-1">Grado</label>
-                            <select id="select-grado" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" disabled></select>
+                            <select id="select-grado"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                disabled></select>
                         </div>
                         <div>
-                            <label for="select-area" class="block text-sm font-medium text-gray-700 mb-1">Área Curricular</label>
-                            <select id="select-area" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" disabled></select>
+                            <label for="select-area" class="block text-sm font-medium text-gray-700 mb-1">Área
+                                Curricular</label>
+                            <select id="select-area"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                disabled></select>
                         </div>
                     </div>
 
@@ -143,18 +244,25 @@
                     </div>
 
                     <!-- Tema Principal -->
-                     <div>
-                        <label for="tema-principal" class="block text-sm font-medium text-gray-700 mb-1">Tema o Unidad Principal para las Actividades</label>
-                        <input type="text" id="tema-principal" value="Inecuaciones lineales y cuadráticas" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ej: Ecuaciones de primer grado, La célula, etc.">
+                    <div>
+                        <label for="tema-principal" class="block text-sm font-medium text-gray-700 mb-1">Tema o Unidad
+                            Principal para las Actividades</label>
+                        <input type="text" id="tema-principal" value="Inecuaciones lineales y cuadráticas"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Ej: Ecuaciones de primer grado, La célula, etc.">
                     </div>
                 </div>
 
             </form>
 
             <div id="wizard-navigation" class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
-                <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors invisible">Anterior</button>
-                <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Siguiente</button>
-                <button id="generate-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors hidden">Generar Vista Previa</button>
+                <button id="prev-btn"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors invisible">Anterior</button>
+                <button id="next-btn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Siguiente</button>
+                <button id="generate-btn"
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors hidden">Generar
+                    Vista Previa</button>
             </div>
         </main>
 
@@ -166,13 +274,17 @@
                 <p class="ml-4 text-gray-600 font-semibold">Generando con Gemini, por favor espera...</p>
             </div>
             <div id="download-section" class="text-center mt-8 hidden">
-                 <p class="text-sm text-gray-500 mb-4">La vista previa ha finalizado. Si todo es correcto, puedes descargar el documento final.</p>
-                <button id="download-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-md">Descargar Archivo .docx</button>
+                <p class="text-sm text-gray-500 mb-4">La vista previa ha finalizado. Si todo es correcto, puedes
+                    descargar el documento final.</p>
+                <button id="download-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-md">Descargar
+                    Archivo .docx</button>
             </div>
         </section>
 
         <footer class="text-center mt-12 text-sm text-gray-500">
-            <p>Una herramienta creada por <a href="#" class="text-indigo-600 hover:underline">Juan Manuel Caicedo Oliva</a> con el poder de la IA de Gemini.</p>
+            <p>Una herramienta creada por <a href="#" class="text-indigo-600 hover:underline">Juan Manuel Caicedo
+                    Oliva</a> con el poder de la IA de Gemini.</p>
             <p>&copy; 2025. Todos los derechos reservados.</p>
         </footer>
 
@@ -183,4 +295,5 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="main.js"></script>
 </body>
+
 </html>
