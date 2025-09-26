@@ -39,6 +39,12 @@ exports.handler = async (event) => {
     }
 
     // 2. Llamar a la API de Gemini para generar el contenido
+    // =======================================================
+    // >>> PUNTO DE DEBUG 1: ¿La clave está cargada y el prompt es correcto?
+    console.log("DEBUG 1: Iniciando llamada a Google AI.");
+    console.log("DEBUG 1: Clave API presente:", !!process.env.GEMINI_API_KEY); 
+    console.log(`DEBUG 1: Prompt a enviar (primeras 50 chars): ${prompt.substring(0, 50)}...`);
+    // =======================================================
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -53,6 +59,11 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
+    // =======================================================
+    // >>> PUNTO DE DEBUG 2: Imprimir el objeto de error COMPLETO
+    console.error("DEBUG 2: Error completo capturado (esto debe mostrar el 404):");
+    console.error(error); // Imprimirá toda la estructura detallada del error de Google AI
+    // =======================================================
     // Manejo de errores durante la ejecución
     console.error("Error en la función generate-contenido:", error);
     return {
