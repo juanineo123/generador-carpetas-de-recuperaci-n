@@ -11,7 +11,7 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("La variable de entorno GEMINI_API_KEY no está definida.");
 }
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 
 // --- FUNCIÓN HANDLER DE NETLIFY ---
