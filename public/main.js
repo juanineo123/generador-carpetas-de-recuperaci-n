@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const MAXIMOS_INTENTOS = 3;
+    // Direcciones de la nueva API en Google Cloud
+    const URL_CONTENIDO = 'https://us-central1-plataforma-escala.cloudfunctions.net/generarContenido';
+    const URL_WORD = 'https://us-central1-plataforma-escala.cloudfunctions.net/generarWord';
     const ESPERA_ENTRE_INTENTOS_MS = 2000;
     // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
     const wizardContainer = document.getElementById('wizard-container');
@@ -201,10 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 console.log(`Iniciando llamada a la API, intento #${intento}...`);
 
-                const response = await fetch('/.netlify/functions/generate-contenido', {
+                const response = await fetch(URL_CONTENIDO, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': undefined // <-- LÍNEA CLAVE: BORRA EL TOKEN DEL GUARDIÁN
+                    },
+                    body: JSON.stringify({ prompt }),
+                    credentials: 'omit'
                 });
 
                 // Si la respuesta es exitosa (ej: 200 OK), procesamos y devolvemos el resultado.
@@ -280,10 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('/.netlify/functions/generate-word', {
+            const response = await fetch(URL_WORD, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(finalDocumentData)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': undefined // <-- LÍNEA CLAVE: BORRA EL TOKEN DEL GUARDIÁN
+                },
+                body: JSON.stringify(finalDocumentData),
+                credentials: 'omit'
             });
 
             if (!response.ok) throw new Error(`Error en el servidor al crear el DOCX: ${response.statusText}`);
