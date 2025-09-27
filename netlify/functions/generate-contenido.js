@@ -14,8 +14,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY, {
     baseUrl: 'https://generativelanguage.googleapis.com', 
 });
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // --- FUNCIÓN HANDLER DE NETLIFY ---
 // Netlify ejecuta esta función 'handler' cada vez que se recibe una petición.
