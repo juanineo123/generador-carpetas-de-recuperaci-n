@@ -10,7 +10,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("La variable de entorno GEMINI_API_KEY no está definida.");
 }
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY, {
+    baseUrl: 'https://generativelanguage.googleapis.com', 
+});
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 
